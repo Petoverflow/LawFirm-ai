@@ -3,7 +3,7 @@ import { CustomKnowledge, GroundingChunk, ExpertMode } from "../types";
 
 // Switched to gemini-3-flash-preview for high speed and improved reasoning capabilities.
 // Strong grounding instructions are added to ensure RAG-like accuracy with search.
-const MODEL_NAME = "gemini-3-flash-preview";
+const MODEL_NAME = "gemini-2.0-flash";
 
 export interface StreamResponseChunk {
   text: string;
@@ -93,35 +93,35 @@ ${personaInstruction}
         tools: tools,
         // Increased temperature slightly for Flash to help it synthesize search results better, 
         // but kept low enough for legal accuracy.
-        temperature: 0.2, 
+        temperature: 0.2,
       },
     });
 
     let fullPrompt = "";
     if (history.length > 0) {
-        fullPrompt += "이전 대화 요약:\n" + history.join("\n") + "\n\n";
+      fullPrompt += "이전 대화 요약:\n" + history.join("\n") + "\n\n";
     }
     fullPrompt += `[상담 모드: ${mode}]\n현재 의뢰인 질문: ${message}`;
 
     const resultStream = await chat.sendMessageStream({
-        message: fullPrompt
+      message: fullPrompt
     });
-    
+
     for await (const chunk of resultStream) {
-        const c = chunk as GenerateContentResponse;
-        // Extract text
-        const text = c.text || "";
-        // Extract grounding chunks if available
-        const groundingChunks = c.candidates?.[0]?.groundingMetadata?.groundingChunks as GroundingChunk[] | undefined;
-        
-        yield { text, groundingChunks };
+      const c = chunk as GenerateContentResponse;
+      // Extract text
+      const text = c.text || "";
+      // Extract grounding chunks if available
+      const groundingChunks = c.candidates?.[0]?.groundingMetadata?.groundingChunks as GroundingChunk[] | undefined;
+
+      yield { text, groundingChunks };
     }
 
   } catch (error) {
     console.error("Gemini API Error:", error);
     // Provide a more specific error message if it's likely an auth error
     if (error.toString().includes("400") || error.toString().includes("API key")) {
-         throw new Error("API 키가 유효하지 않거나 만료되었습니다. 설정을 확인해 주세요.");
+      throw new Error("API 키가 유효하지 않거나 만료되었습니다. 설정을 확인해 주세요.");
     }
     throw new Error("법률 정보를 검색하는 도중 오류가 발생했습니다.");
   }
