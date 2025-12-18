@@ -32,9 +32,15 @@ const App: React.FC = () => {
 
   // Load API Key on mount
   useEffect(() => {
-    const storedKey = localStorage.getItem('lawbot_api_key') || process.env.GEMINI_API_KEY;
-    if (storedKey) {
-      setApiKey(storedKey);
+    // Shared Key (from GitHub Secrets) takes priority so everyone uses the paid key
+    const sharedKey = process.env.GEMINI_API_KEY;
+    const storedKey = localStorage.getItem('lawbot_api_key');
+
+    // Use shared key if available, otherwise fall back to user-entered key
+    const keyToUse = sharedKey || storedKey;
+
+    if (keyToUse) {
+      setApiKey(keyToUse);
     } else {
       setIsApiKeyModalOpen(true);
     }
