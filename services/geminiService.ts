@@ -3,7 +3,7 @@ import { CustomKnowledge, GroundingChunk, ExpertMode } from "../types";
 
 // Switched to gemini-3-flash-preview for high speed and improved reasoning capabilities.
 // Strong grounding instructions are added to ensure RAG-like accuracy with search.
-const MODEL_NAME = "gemini-2.5-flash";
+const MODEL_NAME = "gemini-3-flash";
 
 export interface StreamResponseChunk {
   text: string;
